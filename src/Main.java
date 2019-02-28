@@ -6,5 +6,7 @@ public class Main {
         // Do the thing
         //set up an instance of a database
         db db = new db();
+        db.connect();
+
     }
 }
