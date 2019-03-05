@@ -35,7 +35,7 @@ public class DB {
      * Open an existing database.
      */
     public DB() {
-        c = new SQLiteConnection(new File(database_filename));
+        c = new SQLiteConnection(new File("C:\\Users\\Lucy\\Documents\\University\\ThirdYear\\SocialComputing\\Coursework\\SocialComp\\db" + database_filename));
         try {
             c.open(false);
             System.out.println("Opened database successfully");
@@ -64,11 +64,7 @@ public class DB {
                 Integer user = stat.columnInt(0);
                 Integer item = stat.columnInt(1);
                 Float rating = (float) stat.columnDouble(2); // convert from
-                // double to
-                // float, since
-                // float takes
-                // up less
-                // memory
+                // double to float, since float takes up less memory
 
                 HashMap<Integer, Float> userRatings = data.get(user);
                 // check if this user already exists. If not, create a new
@@ -192,12 +188,5 @@ public class DB {
      */
     public void finish() {
         c.dispose();
-    }
-
-    public static void main(String[] args) {
-        DB db = new DB();
-        db.loadRatings();
-        db.createTestTrainingSet();
-        db.finish();
     }
 }
