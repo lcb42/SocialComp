@@ -1,21 +1,17 @@
 import java.sql.*;
 
+import com.almworks.sqlite4java.SQLiteConnection;
+import com.almworks.sqlite4java.SQLiteException;
+import com.almworks.sqlite4java.SQLiteStatement;
+
+
+
 public class db {
     //sqlite database to handle the ratings data
 
-    private final String url = "jdbc:postgresql://localhost/ratings";
-    private final String user = "postgres";
-    private final String password = "superman";
+    final String database_filename = "comp3208.db";
+    final String trainingset_tablename = "TRAININGSET";
+    public SQLiteConnection c;
 
-    public Connection connect() {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-        return conn;
     }
 }
