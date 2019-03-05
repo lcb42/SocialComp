@@ -35,7 +35,7 @@ public class DB {
      * Open an existing database.
      */
     public DB() {
-        c = new SQLiteConnection(new File("C:\\Users\\Lucy\\Documents\\University\\ThirdYear\\SocialComputing\\Coursework\\SocialComp\\db" + database_filename));
+        c = new SQLiteConnection(new File("C:\\Users\\Lucy\\Documents\\University\\ThirdYear\\SocialComputing\\Coursework\\SocialComp\\db\\" + database_filename));
         try {
             c.open(false);
             System.out.println("Opened database successfully");

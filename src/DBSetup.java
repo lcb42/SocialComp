@@ -29,8 +29,8 @@ public class DBSetup {
 
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
+                //DatabaseMetaData meta = conn.getMetaData();
+                //System.out.println("The driver name is " + meta.getDriverName());
                 System.out.println("A new database has been created.");
             }
 
@@ -39,7 +39,7 @@ public class DBSetup {
         }
     }
 
-    public static void insertData(String csvName, SQLiteConnection c) {
+    public static void insertData(String csvName) {
         String csvFile = csvName;
         BufferedReader br = null;
         String line = "";
@@ -48,29 +48,17 @@ public class DBSetup {
         try {
 
             br = new BufferedReader(new FileReader(csvFile));
-            SQLiteStatement stat = c.prepare("INSERT INTO " + "comp3208.db" + "  VALUES (?,?,?)");
+            //SQLiteStatement stat = c.prepare("INSERT INTO " + "comp3208.db" + "  VALUES (?,?,?)");
 
             while ((line = br.readLine()) != null) {
                 String[] table = line.split(cvsSplitBy);
 
-                c.exec("BEGIN");
 
-                for (Map.Entry<Integer, Float> itemRatingPair : data.get(user).entrySet()) {
-                    stat.bind(1, user);
-                    stat.bind(2, itemRatingPair.getKey());
-                    stat.bind(3, itemRatingPair.getValue());
-                    stat.stepThrough();
-                    stat.reset();
-
-                }
-
-                // now do the commit part to save the changes to file
-                c.exec("COMMIT");
             }
 
 
-        } catch (SQLiteException e) {
-            e.printStackTrace();
+        /*} catch (SQLiteException e) {
+            e.printStackTrace();*/
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
