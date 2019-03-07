@@ -1,7 +1,18 @@
 //package basic;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.almworks.sqlite4java.SQLiteConnection;
@@ -23,7 +34,7 @@ import com.almworks.sqlite4java.SQLiteStatement;
  */
 public class DB {
     final String database_filename = "comp3208.db";
-    final String trainingset_tablename = "TRAININGSET";
+    final String trainingset_tablename = "trainingSet";
     public SQLiteConnection c;
 
     /**
@@ -115,8 +126,8 @@ public class DB {
      */
     public void createTestTrainingSet() {
         // first create new tables
-        String newTrainingset = "NEWTRAININGSET";
-        String newTestset = "NEWTESTSET";
+        String newTrainingset = "newTrainingSet";
+        String newTestset = "newTestSet";
 
         // ratio of values that go to the test set (e.g. 1 in 10)
         int ratio = 10;
@@ -172,6 +183,103 @@ public class DB {
             error(e);
         }
     }
+
+
+/*
+    Creates db and connects to it
+ */
+    public void createNewDatabase(String fileName) {
+
+        String url = "jdbc:sqlite:C:\\Users\\Lucy\\Documents\\University\\ThirdYear\\SocialComputing\\Coursework\\SocialComp\\db\\" + fileName;
+
+        try (Connection conn = DriverManager.getConnection(url)) {
+            if (conn != null) {
+                //DatabaseMetaData meta = conn.getMetaData();
+                //System.out.println("The driver name is " + meta.getDriverName());
+                System.out.println("A new database has been created.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+/*
+    Reads data from csv and inserts it into db
+ */
+    public void readData(String csvName) {
+
+        String delim = ",";
+        HashMap<Integer, HashMap<Integer, Float>> data = new HashMap<>();
+
+        try{
+
+            BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Lucy\\Documents\\University\\ThirdYear\\SocialComputing\\Coursework\\SocialComp\\" + csvName));
+
+            String line = "";
+
+            while ((line = br.readLine()) != null){
+
+                String[] tokens = line.split(delim);
+                int userid = Integer.parseInt(tokens[0]);
+                int itemid = Integer.parseInt(tokens[1]);
+                float rating = Float.parseFloat(tokens[2]);
+
+                HashMap<Integer, Float> itemRatingPairs = null;
+
+                if(data.containsKey(userid)){
+                    itemRatingPairs = data.get(userid);
+                    // Add new itemRatingPair to the previous arraylist as above
+                    itemRatingPairs.put(itemid, rating);
+
+                }else{
+                    //put pair in arraylist first
+                    itemRatingPairs = new HashMap<>();
+                    itemRatingPairs.put(itemid, rating);
+                }
+                data.put(userid, itemRatingPairs);
+
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+        insert(data);
+    }
+
+    /*
+        Performs the insert into db
+     */
+    public void insert(HashMap<Integer, HashMap<Integer, Float>> data){
+
+        String sql = "INSERT INTO trainingSet VALUES(?,?,?)";
+
+        try{
+
+            SQLiteStatement pstmt = c.prepare(sql);
+
+            for (Integer user : data.keySet()) {
+                c.exec("BEGIN");
+
+                for (Entry itemRatingPair : data.get(user).entrySet()) {
+                    pstmt.bind(1, user);
+                    pstmt.bind(2, (Integer) itemRatingPair.getKey());
+                    pstmt.bind(3, (Float) itemRatingPair.getValue());
+                    pstmt.stepThrough();
+                    pstmt.reset();
+                }
+
+                // now do the commit part to save the changes to file
+                c.exec("COMMIT");
+
+            }
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     /**
      * Show error message.
